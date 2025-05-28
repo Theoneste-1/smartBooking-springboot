@@ -54,7 +54,7 @@ public class AuthService {
         user.setUpdatedAt(LocalDateTime.now());
         user.setActive(true);
         user.setVerified(false);
-
+        user.setAgreedToTerms(registerRequest.isAgreedToTerms());
         // Save user
         userRepository.save(user);
 
