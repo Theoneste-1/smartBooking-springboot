@@ -1,11 +1,16 @@
 package com.bookingsmart.models;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "categories")
+@Getter
+@Setter
 public class Category {
 
     @Id
@@ -23,45 +28,4 @@ public class Category {
 
     @Column(name = "is_active")
     private boolean isActive = true;
-
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Set<Service> getServices() {
-        return services;
-    }
-
-    public void setServices(Set<Service> services) {
-        this.services = services;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
 }

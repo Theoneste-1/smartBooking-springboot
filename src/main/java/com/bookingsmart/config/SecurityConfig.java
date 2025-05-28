@@ -53,6 +53,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/client/**").hasRole("CLIENT")
                         .anyRequest().authenticated()
                 )
                 .httpBasic(AbstractHttpConfigurer::disable) // Disable basic auth if not needed

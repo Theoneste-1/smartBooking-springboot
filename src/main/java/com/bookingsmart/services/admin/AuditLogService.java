@@ -26,8 +26,8 @@ public class AuditLogService {
      * Create a new audit log entry
      */
     @Transactional
-    public AuditLog createAuditLog(Admin admin, String action, String entityType, Long entityId,
-            String details, String ipAddress) {
+    public void createAuditLog(Admin admin, String action, String entityType, Long entityId,
+                               String details, String ipAddress) {
         AuditLog auditLog = new AuditLog();
         auditLog.setAdmin(admin);
         auditLog.setAction(action);
@@ -37,7 +37,7 @@ public class AuditLogService {
         auditLog.setIpAddress(ipAddress);
         auditLog.setCreatedAt(LocalDateTime.now());
 
-        return auditLogRepository.save(auditLog);
+        auditLogRepository.save(auditLog);
     }
 
     /**

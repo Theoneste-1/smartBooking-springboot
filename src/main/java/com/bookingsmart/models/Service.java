@@ -1,12 +1,21 @@
 package com.bookingsmart.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "services")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Service {
 
     @Id
@@ -38,77 +47,4 @@ public class Service {
 
     @Column(name = "is_active")
     private boolean isActive = true;
-
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getDurationMinutes() {
-        return durationMinutes;
-    }
-
-    public void setDurationMinutes(Integer durationMinutes) {
-        this.durationMinutes = durationMinutes;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public Professional getProfessional() {
-        return professional;
-    }
-
-    public void setProfessional(Professional professional) {
-        this.professional = professional;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public Set<Appointment> getAppointments() {
-        return appointments;
-    }
-
-    public void setAppointments(Set<Appointment> appointments) {
-        this.appointments = appointments;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
 }

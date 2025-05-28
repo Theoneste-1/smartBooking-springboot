@@ -1,7 +1,6 @@
 package com.bookingsmart.services.admin;
 
 import com.bookingsmart.models.Admin;
-import com.bookingsmart.models.Admin.AdminRole;
 import com.bookingsmart.repositories.AdminRepository;
 import com.bookingsmart.services.admin.AuditLogService;
 import org.springframework.stereotype.Service;
@@ -78,29 +77,8 @@ public class AdminService {
         return adminRepository.findAll();
     }
 
-    public List<Admin> getAdminsByRole(AdminRole role) {
-        return adminRepository.findByRole(role);
-    }
-
     public List<Admin> getAdminsByDepartment(String department) {
         return adminRepository.findByDepartment(department);
     }
 
-    @Transactional
-    public void changeAdminRole(Long id, AdminRole newRole) {
-        Admin admin = adminRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Admin not found"));
-
-        AdminRole oldRole = AdminRole.SUPER_ADMIN;
-        admin.setRole(newRole);
-
-        Admin updatedAdmin = adminRepository.save(admin);
-        auditLogService.createAuditLog(
-                admin,
-                "CHANGE_ROLE",
-                "ADMIN",
-                updatedAdmin.getId(),
-                String.format("Changed role from %s to %s", oldRole, newRole),
-                null);
-    }
 }
