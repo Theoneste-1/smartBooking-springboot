@@ -42,6 +42,10 @@ public class Professional extends User {
     @Column(name = "is_verified")
     private boolean isVerified = false;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "admin_id") // Foreign key in Professional table
+    private Admin admin;
+
     @OneToMany(mappedBy = "professional", cascade = CascadeType.ALL)
     private Set<Service> services = new HashSet<>();
 

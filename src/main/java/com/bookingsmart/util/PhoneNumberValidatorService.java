@@ -35,7 +35,7 @@ public class PhoneNumberValidatorService {
             }
 
             if (userRepository.existsByPhoneNumber(phoneNumber)) {
-                throw new PhoneNumberException("Phone number already exists in the database");
+                throw new PhoneNumberException("User with Phone number already exists");
             }
         return true;
     }

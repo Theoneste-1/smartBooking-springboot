@@ -3,6 +3,8 @@ package com.bookingsmart.controllers;
 import com.bookingsmart.dto.response.UserResponse;
 import com.bookingsmart.models.User;
 import com.bookingsmart.services.user.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/public")
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
@@ -27,8 +29,8 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<Page<UserResponse>> getAllUsers(Pageable pageable) {
+        return ResponseEntity.ok(userService.getAllUsers(pageable));
     }
 
     @PutMapping("/{id}")
@@ -44,8 +46,4 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/unique/hello")
-    String getHello (){
-        return "Hello world";
-    }
 }

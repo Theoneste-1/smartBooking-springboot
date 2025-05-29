@@ -73,12 +73,27 @@ public class AuthService {
     }
 
     @Transactional
-    public AuthResponse login(String username, String password) throws EmailValidationException {
+    public AuthResponse login(String usernameOrEmail, String password) throws EmailValidationException {
+
+        String emailForAuth;
+        User user;
+        if (isEmail(usernameOrEmail)) {
+            emailForAuth = usernameOrEmail;
+            user = userRepository.findByEmail(usernameOrEmail)
+                    .orElseThrow(() -> new EmailValidationException("Email not found: " + usernameOrEmail));
+        } else {
+            user = userRepository.findByUsername(usernameOrEmail)
+                    .orElseThrow(() -> new EmailValidationException("Username not found: " + usernameOrEmail));
+            emailForAuth = user.getEmail();
+            if (emailForAuth == null) {
+                throw new EmailValidationException("No email associated with username: " + usernameOrEmail);
+            }
+        }
+
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password));
+                new UsernamePasswordAuthenticationToken(emailForAuth, password));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        User user = loginValidation.isUsernameExists(username);
         user.setLastLogin(LocalDateTime.now());
         userRepository.save(user);
 
@@ -102,5 +117,10 @@ public class AuthService {
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
+
+    private boolean isEmail(String input) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        return input != null && input.matches(emailRegex);
     }
 }

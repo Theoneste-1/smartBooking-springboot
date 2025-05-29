@@ -1,5 +1,6 @@
 package com.bookingsmart.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,8 +25,7 @@ public class Admin extends User {
     @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL)
     private Set<AuditLog> auditLogs = new HashSet<>();
 
-    @OneToOne
+    @OneToOne(mappedBy = "admin", fetch = FetchType.LAZY)
+    @JsonIgnore
     private Professional professional;
-
-
 }

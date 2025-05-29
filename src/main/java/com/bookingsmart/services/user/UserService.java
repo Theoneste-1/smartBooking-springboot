@@ -3,6 +3,10 @@ package com.bookingsmart.services.user;
 import com.bookingsmart.dto.response.UserResponse;
 import com.bookingsmart.models.User;
 import com.bookingsmart.repositories.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +16,8 @@ import java.util.Optional;
 
 @Service
 public class UserService {
+
+    private final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -69,12 +75,9 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public List<UserResponse> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
-                .map(user -> new UserResponse(user.getId(), user.getUsername(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getPhoneNumber()))
-                .toList();
-
+    public Page<UserResponse> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable)
+                .map(user -> new UserResponse(user.getId(), user.getUsername(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getPhoneNumber()));
 
     }
 }

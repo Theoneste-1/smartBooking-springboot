@@ -18,6 +18,9 @@ public class RegistrationValidation {
     private PhoneNumberValidatorService phoneNumberValidatorService;
 
     @Autowired
+    private LoginValidation loginValidation;
+
+    @Autowired
     private UserRepository userRepository;
 
     public boolean validateUsername(String username) throws UsernameConflictException {
@@ -29,6 +32,7 @@ public class RegistrationValidation {
     }
 
     public boolean validateEmail(String email) throws EmailConflictException {
+            boolean isValidEmail = loginValidation.validateEmail(email);
             boolean emailExists = userRepository.existsByEmail(email);
             if (emailExists) {
                 throw new EmailConflictException("Email already exist");
