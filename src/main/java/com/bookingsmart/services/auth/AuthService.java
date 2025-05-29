@@ -2,10 +2,7 @@ package com.bookingsmart.services.auth;
 
 import com.bookingsmart.dto.request.RegisterRequest;
 import com.bookingsmart.dto.response.AuthResponse;
-import com.bookingsmart.exceptions.custom.EmailConflictException;
-import com.bookingsmart.exceptions.custom.PasswordValidationException;
-import com.bookingsmart.exceptions.custom.PhoneNumberException;
-import com.bookingsmart.exceptions.custom.UsernameConflictException;
+import com.bookingsmart.exceptions.custom.*;
 import com.bookingsmart.models.User;
 import com.bookingsmart.repositories.UserRepository;
 
@@ -76,7 +73,7 @@ public class AuthService {
     }
 
     @Transactional
-    public AuthResponse login(String username, String password) {
+    public AuthResponse login(String username, String password) throws EmailValidationException {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password));
         SecurityContextHolder.getContext().setAuthentication(authentication);
