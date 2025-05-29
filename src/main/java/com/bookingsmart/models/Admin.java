@@ -21,16 +21,11 @@ public class Admin extends User {
     @Column(name = "department")
     private String department;
 
-
-
     @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL)
     private Set<AuditLog> auditLogs = new HashSet<>();
 
-    public Set<AuditLog> getAuditLogs() {
-        return auditLogs;
-    }
+    @OneToOne
+    private Professional professional;
 
-    public void setAuditLogs(Set<AuditLog> auditLogs) {
-        this.auditLogs = auditLogs;
-    }
+
 }

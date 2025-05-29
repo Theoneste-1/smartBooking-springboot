@@ -1,13 +1,22 @@
 package com.bookingsmart.services.auth;
 
 import com.bookingsmart.dto.request.RegisterRequest;
+import com.bookingsmart.dto.response.AuthResponse;
+import com.bookingsmart.exceptions.custom.EmailConflictException;
+import com.bookingsmart.exceptions.custom.PasswordValidationException;
+import com.bookingsmart.exceptions.custom.PhoneNumberException;
+import com.bookingsmart.exceptions.custom.UsernameConflictException;
 import com.bookingsmart.models.User;
 import com.bookingsmart.repositories.UserRepository;
 
+import com.bookingsmart.util.LoginValidation;
+import com.bookingsmart.util.PhoneNumberValidatorService;
+import com.bookingsmart.util.RegistrationValidation;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,72 +24,69 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 @Service
+
 public class AuthService {
 
+    private final RegistrationValidation registrationValidation;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
+    private final PhoneNumberValidatorService phoneNumberValidatorService;
+    private final LoginValidation loginValidation;
 
-    public AuthService(UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
-            AuthenticationManager authenticationManager,
-            TokenService tokenService) {
+    public AuthService(RegistrationValidation registrationValidation, UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, TokenService tokenService, PhoneNumberValidatorService phoneNumberValidatorService, LoginValidation loginValidation) {
+        this.registrationValidation = registrationValidation;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
+        this.phoneNumberValidatorService = phoneNumberValidatorService;
+        this.loginValidation = loginValidation;
+    }
+
+
+    @Transactional
+    public String register(RegisterRequest registerRequest) throws UsernameConflictException, EmailConflictException, PhoneNumberException, PasswordValidationException {
+
+        boolean isUsernameValidated = registrationValidation.validateUsername(registerRequest.getUsername());
+        boolean isEmailValidated = registrationValidation.validateEmail(registerRequest.getEmail());
+        boolean isPasswordValidated = registrationValidation.validatePassword(registerRequest.getPassword());
+        boolean isPhoneNumberValidated = phoneNumberValidatorService.validatePhoneNumber(registerRequest.getPhoneNumber());
+
+            // Create new user
+            User user = new User();
+            user.setUsername(registerRequest.getUsername());
+            user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+            user.setEmail(registerRequest.getEmail());
+            user.setFirstName(registerRequest.getFirstName());
+            user.setLastName(registerRequest.getLastName());
+            user.setPhoneNumber(registerRequest.getPhoneNumber());
+            user.setCreatedAt(LocalDateTime.now());
+            user.setUpdatedAt(LocalDateTime.now());
+            user.setRole(registerRequest.getRole());
+            user.setActive(true);
+            user.setVerified(false);
+            user.setAgreedToTerms(registerRequest.isAgreedToTerms());
+            // Save user
+            userRepository.save(user);
+
+            return "User Registered Successfully";
+
     }
 
     @Transactional
-    public String register(RegisterRequest registerRequest) {
-        // Check if username or email already exists
-        if (userRepository.existsByUsername(registerRequest.getUsername())) {
-            throw new RuntimeException("Username already exists");
-        }
-        if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new RuntimeException("Email already exists");
-        }
-
-        // Create new user
-        User user = new User();
-        user.setUsername(registerRequest.getUsername());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setEmail(registerRequest.getEmail());
-        user.setFirstName(registerRequest.getFirstName());
-        user.setLastName(registerRequest.getLastName());
-        user.setPhoneNumber(registerRequest.getPhoneNumber());
-        user.setCreatedAt(LocalDateTime.now());
-        user.setUpdatedAt(LocalDateTime.now());
-        user.setActive(true);
-        user.setVerified(false);
-        user.setAgreedToTerms(registerRequest.isAgreedToTerms());
-        // Save user
-        userRepository.save(user);
-
-        // Authenticate the user and generate token
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        registerRequest.getUsername(),
-                        registerRequest.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        return tokenService.generateToken(authentication);
-    }
-
-    @Transactional
-    public String login(String username, String password) {
+    public AuthResponse login(String username, String password) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
+        User user = loginValidation.isUsernameExists(username);
         user.setLastLogin(LocalDateTime.now());
         userRepository.save(user);
 
-        return tokenService.generateToken(authentication);
+        String token =  tokenService.generateToken(authentication);
+        return new AuthResponse(token, user.getUsername(), user.getRole());
     }
 
     @Transactional

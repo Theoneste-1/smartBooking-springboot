@@ -1,5 +1,6 @@
 package com.bookingsmart.dto.request;
 
+import com.bookingsmart.models.UserRole;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +15,6 @@ public class RegisterRequest {
     private String firstName;
     private String lastName;
     private String phoneNumber;
-    private String role;
+    private UserRole role;
     private boolean isAgreedToTerms;
 }

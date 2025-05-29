@@ -4,6 +4,10 @@ import com.bookingsmart.dto.request.ChangePasswordRequest;
 import com.bookingsmart.dto.request.LoginRequest;
 import com.bookingsmart.dto.request.RegisterRequest;
 import com.bookingsmart.dto.response.AuthResponse;
+import com.bookingsmart.exceptions.custom.EmailConflictException;
+import com.bookingsmart.exceptions.custom.PasswordValidationException;
+import com.bookingsmart.exceptions.custom.PhoneNumberException;
+import com.bookingsmart.exceptions.custom.UsernameConflictException;
 import com.bookingsmart.services.auth.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,14 +24,12 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
-        String token = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
-        return ResponseEntity.ok(new AuthResponse(token));
+      return ResponseEntity.ok(authService.login(loginRequest.getUsername(), loginRequest.getPassword()));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest registerRequest) {
-        String token = authService.register(registerRequest);
-        return ResponseEntity.ok(new AuthResponse(token));
+    public ResponseEntity<String> register(@RequestBody RegisterRequest registerRequest) throws UsernameConflictException, EmailConflictException, PasswordValidationException, PhoneNumberException {
+        return ResponseEntity.ok(authService.register(registerRequest));
     }
 
     @PostMapping("/logout")
@@ -41,4 +43,5 @@ public class AuthController {
         authService.changePassword(request.getUserId(), request.getOldPassword(), request.getNewPassword());
         return ResponseEntity.ok().build();
     }
+
 }

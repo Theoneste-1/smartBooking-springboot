@@ -21,6 +21,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
+    boolean existsByPhoneNumber(String phoneNumber);
     @Query("SELECT u FROM User u WHERE u.isActive = true")
     List<User> findAllActive();
 

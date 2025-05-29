@@ -33,3 +33,4 @@ public class Client extends User {
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private Set<Payment> payments = new HashSet<>();
 }
+
